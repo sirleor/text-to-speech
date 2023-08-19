@@ -1,0 +1,33 @@
+import requests
+import json
+import math
+import time
+#read file "konspekt.uus072023.txt
+with open("konspekt.uus072023.txt", encoding='UTF-8') as f:
+    txt=f.read()
+#split and save
+salvesta_rida=txt.split("\n")
+# use https://neurokone.ee/ API
+url="https://api.tartunlp.ai/text-to-speech/v2"
+##data={
+##  "text":"\n".join(salvesta_rida[0:70]),
+##  "speaker": "meelis",
+##  "speed": 1
+##}
+#make data to smaller chunks
+resp=requests.post(url, json = data)
+chunk_size=50
+n_splits=len(salvesta_rida)/chunk_size
+math.ceil(n_splits)
+# put all together to get pieces of wav-files-s
+for i in range(math.ceil(n_splits)):
+    data={
+      "text":"\n".join(salvesta_rida[i*chunk_size:(i*chunk_size+chunk_size)]),
+      "speaker": "meelis",
+      "speed": 1
+            }
+    resp=requests.post(url, json = data)
+    with open(f"audio/audio_{i}.wav", 'wb') as file:
+        file.write(resp.content)
+    print(f'done chunk {i}')
+    time.sleep(1) # this part is needed to not to overwhelm API
